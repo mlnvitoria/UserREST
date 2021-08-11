@@ -26,7 +26,7 @@ use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
  *      @OA\Property(property="api_token", type="string")
  * )
  * */
-class User extends Model implements AuthenticatableContract, AuthorizableContract
+class User extends ModelAbstract implements AuthenticatableContract, AuthorizableContract
 {
     use Authenticatable, Authorizable, HasFactory, SoftDeletes;
     
@@ -50,23 +50,16 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         'deleted_at',
     ];
 
-    protected static $rules = [
-        [
-            'store' => [
-                'firstname' => ['required', 'min:2', 'max:100'],
-                'lastname' => ['required', 'min:2', 'max:100'],
-                'email' => ['required','email:rfc,dns'],
-            ],
-            'update' => [
-                'firstname' => ['min:2', 'max:100'],
-                'lastname' => ['min:2', 'max:100'],
-                'email' => ['email:rfc,dns'],
-            ],
-        ],  
+    protected $rules = [
+        'store' => [
+            'firstname' => ['required', 'min:2', 'max:100'],
+            'lastname' => ['required', 'min:2', 'max:100'],
+            'email' => ['required','email:rfc,dns'],
+        ],
+        'update' => [
+            'firstname' => ['min:2', 'max:100'],
+            'lastname' => ['min:2', 'max:100'],
+            'email' => ['email:rfc,dns'],
+        ], 
     ];
-
-    public static function getValidatorRules($name)
-    {
-        return isset(self::$rules[$name]) ? self::$rules[$name] : [];
-    }
 }
