@@ -5,6 +5,10 @@ Built with [Lumen PHP Framework](https://lumen.laravel.com/)!
 Laravel Lumen is a stunningly fast PHP micro-framework for building web applications with expressive, elegant syntax. We believe development must be an enjoyable, creative experience to be truly fulfilling. Lumen attempts to take the pain out of development by easing common tasks used in the majority of web projects, such as routing, database abstraction, queueing, and caching.
 
 
+## Documentation
+You can check our API documentation at [Internal Swagger (/api/documentation)](http://test.local/api/documentation).
+
+
  ## Local Environment
  Make sure docker is installed.
 
@@ -21,7 +25,12 @@ Enter this project's folder and then run the following commands:
  We'll need to do some configurations inside container, so follow these steps in a new command line:
  - Please run `docker ps` and check your container name;
  - Run `docker exec -it {CONTAINER_NAME} /bin/bash` to enter inside it;
- - `cd /app && composer install` to install project's dependencies.
+ - Enter inside this project using `cd /app`;
+ - Copy environment variables examples using `cp .env.example .env` and set your environment for MySQL credentials;
+ - Make sure you have the database listed at .env "DB_DATABASE" created in your DB;
+ - `composer install` to install project's dependencies;
+ - `php artisan migrate` to run all migrations and update your database;
+ - `php artisan swagger-lume:generate` to generate brand-new info for our Swagger Documentation;
  
  ### Creating V-Hosts at Apache
  To avoid using `localhost/public` at this project, I prefer using vhosts.
@@ -52,4 +61,4 @@ Enter this project's folder and then run the following commands:
 - Enter your hosts file using `vim /etc/hosts` and add a new line with `127.0.0.1 test.local` and save it;
 - Restart apache typing `service apache2 restart`.
 
-And then your [test.local domain](http://test.local/) is up!
+And then your [test.local domain](http://test.local/) is up and ready to use!
