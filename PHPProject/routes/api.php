@@ -10,9 +10,16 @@
 
 
 
-$router->group(['prefix' => 'api/v1'], function() use ($router) {
-    $router->get('/', function () use ($router) {
-        return $router->app->version();
+$router->group(['prefix' => '/api/v1'], function() use ($router) {
+
+    $router->group(['prefix' => '/user'], function() use ($router) {
+        $router->post('/', 'UserController@store');
+
+        $router->group(['middleware' => 'auth'], function() use ($router) {
+            $router->get('/{id}', 'UserController@show');
+            $router->put('/{id}', 'UserController@update');
+            $router->delete('/{id}', 'UserController@delete');
+        });
     });
 });
 
