@@ -3,11 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Auth\Authenticatable;
-use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
-use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Laravel\Lumen\Auth\Authorizable;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
+use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 
 
 /**
@@ -16,44 +17,19 @@ use Laravel\Lumen\Auth\Authorizable;
  *   description="Operations about user",
  * )
  *
- * @OA\Schema(@OA\Xml(name="User"))
+ * @OA\Schema(
+ *      @OA\Xml(name="User"),
+ *      @OA\Property(property="id", type="integer"),
+ *      @OA\Property(property="firstname", type="string"),
+ *      @OA\Property(property="lastname", type="string"),
+ *      @OA\Property(property="email", type="string"),
+ *      @OA\Property(property="api_token", type="string")
+ * )
  * */
 class User extends Model implements AuthenticatableContract, AuthorizableContract
 {
-    use Authenticatable, Authorizable, HasFactory;
+    use Authenticatable, Authorizable, HasFactory, SoftDeletes;
     
-
-    /**
-     * @OA\Property(format="int64")
-     * @var int
-     */
-    public $id;
-
-    /**
-     * @OA\Property()
-     * @var string
-     */
-    public $firstname;
-
-    /**
-     * @OA\Property()
-     * @var string
-     */
-    public $lastname;
-
-    /**
-     * @var string
-     * @OA\Property()
-     */
-    public $email;
-
-    /**
-     * @OA\Property()
-     * @var string
-     */
-    public $apiToken;
-
-
     /**
      * The attributes that are mass assignable.
      *
@@ -71,6 +47,26 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
      * @var array
      */
     protected $hidden = [
-        'api_token',
+        'deleted_at',
     ];
+
+    protected static $rules = [
+        [
+            'store' => [
+                'firstname' => ['required', 'min:2', 'max:100'],
+                'lastname' => ['required', 'min:2', 'max:100'],
+                'email' => ['required','email:rfc,dns'],
+            ],
+            'update' => [
+                'firstname' => ['min:2', 'max:100'],
+                'lastname' => ['min:2', 'max:100'],
+                'email' => ['email:rfc,dns'],
+            ],
+        ],  
+    ];
+
+    public static function getValidatorRules($name)
+    {
+        return isset(self::$rules[$name]) ? self::$rules[$name] : [];
+    }
 }
