@@ -4,7 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 
-class ExampleMiddleware
+class JsonRequestMiddleware
 {
     /**
      * Handle an incoming request.
@@ -15,6 +15,13 @@ class ExampleMiddleware
      */
     public function handle($request, Closure $next)
     {
+        if (in_array($request->method(), ['POST', 'PUT', 'PATCH'])
+            && $request->isJson()
+        ) {
+            $data = $request->json()->all();
+            $request->request->replace(is_array($data) ? $data : []);
+        }
+
         return $next($request);
     }
 }
