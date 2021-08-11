@@ -66,6 +66,6 @@ class UserRepository implements IRepository
 
     public function getValidatorRules($name) : array
     {
-        return User::getValidatorRules($name);
+        return (new User())->getValidatorRules($name);
     }
 }
