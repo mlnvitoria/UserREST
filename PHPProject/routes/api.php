@@ -21,8 +21,12 @@ $router->group(['prefix' => '/api/v1'], function() use ($router) {
             $router->delete('/{id}', 'UserController@delete');
         });
     });
-});
 
-$router->get('/', function () {
-    return "Hi";
+    $router->group(['prefix' => '/customer', 'middleware' => 'auth'], function() use ($router) {
+        $router->get('/', 'CustomerController@index');
+        $router->get('/{id}', 'CustomerController@show');
+        $router->post('/', 'CustomerController@store');
+        $router->put('/{id}', 'CustomerController@update');
+        $router->delete('/{id}', 'CustomerController@delete');
+    });
 });
