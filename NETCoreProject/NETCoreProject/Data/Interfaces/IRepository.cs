@@ -2,14 +2,13 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace NETCoreProject.Data
+namespace NETCoreProject.Data.Interfaces
 {
     public interface IRepository<T> where T : class, IEntity
     {
-        Task<List<T>> Get();
-        Task<T> GetById();
+        Task<T> GetById(int id);
         Task<T> Create(T entity);
-        Task<T> Update(int id, T entity);
+        Task<T> Update(T entity);
         Task<T> DeleteById(int id);
     }
 }
