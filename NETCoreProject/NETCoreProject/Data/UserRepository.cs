@@ -1,35 +1,44 @@
 ﻿using NETCoreProject.Models;
+using NETCoreProject.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Linq;
+using Microsoft.EntityFrameworkCore;
+using NETCoreProject.Data.Interfaces;
 
 namespace NETCoreProject.Data
 {
-    public class UserRepository : IRepository<User>
+    public class UserRepository : EfCoreRepository<User>, IUserRepository
     {
-        public Task<User> Create(User entity)
+        public UserRepository(ProjectDbContext context) : base(context) { }
+
+        public async Task<User> FindByApiToken(string apiToken)
         {
-            throw new NotImplementedException();
+            return await DbSet.FirstOrDefaultAsync(u => u.ApiToken == apiToken);
         }
 
-        public Task<User> DeleteById(int id)
+        public new async Task<User> Create(User user)
         {
-            throw new NotImplementedException();
+            var helper = new ApiTokenHelper();
+            user.ApiToken = helper.GenerateToken();
+
+            return await base.Create(user);
         }
 
-        public Task<List<User>> Get()
+        public async Task<User> Update(User user)
         {
-            throw new NotImplementedException();
-        }
+            var oldUser = Context.User.AsNoTracking<User>().FirstOrDefault(u => u.Id == user.Id);
+            if (oldUser.Id == 0)
+            {
+                return null;
+            }
 
-        public Task<User> GetById()
-        {
-            throw new NotImplementedException();
-        }
+            user.ApiToken = oldUser.ApiToken;
+            user.CreatedAt = oldUser.CreatedAt;
+            user.DeletedAt = null;
 
-        public Task<User> Update(int id, User entity)
-        {
-            throw new NotImplementedException();
+            return await base.Update(user);
         }
     }
 }
