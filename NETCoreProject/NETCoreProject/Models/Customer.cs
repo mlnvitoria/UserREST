@@ -20,7 +20,7 @@ namespace NETCoreProject.Models
         public DateTime Birthdate { get; set; }
 
         [DefaultValue(true)]
-        public bool Enabled { get; set; }
+        public bool Enabled { get; set; } = true;
 
         [DataType(DataType.Date)]
         public DateTime? CreatedAt { get; set; }
