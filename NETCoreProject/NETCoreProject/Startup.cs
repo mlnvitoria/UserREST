@@ -8,6 +8,10 @@ using Microsoft.OpenApi.Models;
 using System;
 
 using NETCoreProject.Data;
+using NETCoreProject.Models;
+using System.Linq;
+using NETCoreProject.Data.Interfaces;
+using NETCoreProject.OperationFilters;
 
 namespace NETCoreProject
 {
@@ -27,9 +31,13 @@ namespace NETCoreProject
                 options.UseSqlServer(Configuration.GetConnectionString("ProjectDbContext")));
 
             services.AddControllers();
-            services.AddSwaggerGen(c =>
+
+            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<ICustomerRepository, CustomerRepository>();
+
+            services.AddSwaggerGen(s =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo {
+                s.SwaggerDoc("v1", new OpenApiInfo {
                     Title = "The .NET Core Project Documentation", 
                     Version = "v1",
                     Description = "This is the documentation for UserREST NETCoreProject's API",
@@ -45,6 +53,18 @@ namespace NETCoreProject
                         Url = new Uri("http://www.apache.org/licenses/LICENSE-2.0.html"),
                     }
                 });
+                s.OperationFilter<XApiTokenOperationFilter>();
+                s.AddSecurityDefinition("X-API-TOKEN", new OpenApiSecurityScheme
+                {
+                    Scheme = "API Token",
+                    Name = "X-API-Token",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.ApiKey,
+                    Description = "The given APIToken from User"
+                });
+
+
+                s.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
             });
         }
 
@@ -54,14 +74,17 @@ namespace NETCoreProject
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "The .NET Core Project (v1)"));
             }
+            app.UseSwagger();
+            app.UseSwaggerUI(c => {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "The .NET Core Project (v1)");
+            });
 
             app.UseHttpsRedirection();
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
